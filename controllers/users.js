@@ -48,7 +48,64 @@ const updateUser = (req, res, next) => {
     });
 };
 
+const createUser = (req, res, next) => {
+  const {
+    email,
+    name,
+    password,
+  } = req.body;
+  bcrypt
+    .hash(password, 10)
+    .then((hash) => User.create({
+      email,
+      name,
+      password: hash,
+    }))
+    .then((user) => res
+      .status(201)
+      .send({
+        data: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+        },
+      }))
+    .catch((err) => {
+      if (err.code === 11000) {
+        next(new ConflictError('Такой пользователь уже зарегистрирован'));
+        return;
+      }
+      if (err.name === 'ValidationError') {
+        next(new BadReqError('Переданы некорректные данные при создании пользователя'));
+        return;
+      }
+      next(err);
+    });
+};
+
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        { expiresIn: '7d' },
+      );
+      return res.status(200).send({ token });
+    })
+    .catch((err) => {
+      if (err.name === 'Unauthorized') {
+        next(new UnauthorizationError('Неправильный льгин или пароль'));
+        return;
+      }
+      next(err);
+    });
+};
+
 module.exports = {
   findUserBySelfId,
   updateUser,
+  createUser,
+  login,
 };

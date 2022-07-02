@@ -9,7 +9,7 @@ router.get('/users/me', findUserBySelfId);
 
 router.patch('/users/me', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().unique().email(),
+    email: Joi.string().required().email(),
     name: Joi.string().required(),
   }),
 }), updateUser);
