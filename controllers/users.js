@@ -27,8 +27,8 @@ const updateUser = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user._id,
     {
+      email: req.body.email,
       name: req.body.name,
-      about: req.body.about,
     },
     {
       new: true,
