@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const regex = require('../utils/regex');
 
 const movieSchema = new mongoose.Schema({
   country: {
@@ -15,7 +14,7 @@ const movieSchema = new mongoose.Schema({
     required: true,
   },
   year: {
-    type: Number,
+    type: String,
     required: true,
   },
   description: {
@@ -25,17 +24,14 @@ const movieSchema = new mongoose.Schema({
   image: {
     type: String,
     required: true,
-    validator: ((v) => regex.test(v)),
   },
   trailerLink: {
     type: String,
     required: true,
-    validator: ((v) => regex.test(v)),
   },
   thumbnail: {
     type: String,
     required: true,
-    validator: ((v) => regex.test(v)),
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
@@ -46,14 +42,14 @@ const movieSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  nameRu: {
+  nameRU: {
     type: String,
     required: true,
   },
-  nameEng: {
+  nameEN: {
     type: String,
     required: true,
   },
 });
 
-module.exports = mongoose.Schema('movie', movieSchema);
+module.exports = mongoose.model('movie', movieSchema);

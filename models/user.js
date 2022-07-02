@@ -6,7 +6,7 @@ const UnauthorizedError = require('../errors/UnauthorizedError');
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
-    require: true,
+    required: true,
     unique: true,
     validate: {
       validator: (email) => validator.isEmail(email),
@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
   },
   name: {
     type: String,
-    require: true,
+    required: true,
     minlength: 2,
     maxlength: 30,
   },
@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.static.findUserByCredentials = function authentification(email, password) {
+userSchema.statics.findUserByCredentials = function authentication(email, password) {
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) throw new UnauthorizedError('Неправильная почта или пароль');
