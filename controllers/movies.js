@@ -18,7 +18,7 @@ const postMovie = (req, res, next) => {
     year,
     description,
     image,
-    trailer,
+    trailerLink,
     nameRU,
     nameEN,
     thumbnail,
@@ -32,14 +32,14 @@ const postMovie = (req, res, next) => {
     year,
     description,
     image,
-    trailer,
+    trailerLink,
     nameRU,
     nameEN,
     thumbnail,
     movieId,
     owner,
   })
-    .then((movie) => res.Status(200).send(movie))
+    .then((movie) => res.status(200).send(movie))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadReqError('Переданы некорректные данные при создании фильма'));
@@ -50,11 +50,11 @@ const postMovie = (req, res, next) => {
 };
 
 const deleteMovie = (req, res, next) => {
-  Movie.findById(req.params.movieId)
+  Movie.findById(req.params._id)
     .then((movie) => {
       if (!movie) throw new NotFoundError('Карточка с указанным _id не найдена');
       if (movie.owner.toString() !== req.user._id.toString()) throw new ForbiddenError('Карточка создана другим пользователем');
-      return Movie.findByIdAndRemove(req.params.movieId)
+      return Movie.findByIdAndRemove(req.params._id)
         .then(() => res.status(200).send({ message: `фильм ${movie.nameRU} успешно удален` }));
     })
     .catch((err) => {
