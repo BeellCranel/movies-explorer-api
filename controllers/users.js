@@ -7,16 +7,26 @@ const BadReqError = require('../errors/BedReqError');
 const NotFoundError = require('../errors/NotFoundError');
 const ConflictError = require('../errors/ConflictError');
 const UnauthorizationError = require('../errors/UnauthorizedError');
+const {
+  findUserBySelfIdNFE,
+  findUserBySelfIdCastError,
+  updateUserNFE,
+  updateUserValE,
+  updateUserConflictE,
+  createUserConflictE,
+  createUserValE,
+  loginUnauthorized,
+} = require('../utils/constants');
 
 const findUserBySelfId = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
-      if (!user) throw new NotFoundError('Пользователь по указанному _id не найден');
+      if (!user) throw new NotFoundError(findUserBySelfIdNFE);
       return res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadReqError('Переданы некорректные данные. Пользователь с этим Id отсутствует'));
+        next(new BadReqError(findUserBySelfIdCastError));
         return;
       }
       next(err);
@@ -36,16 +46,16 @@ const updateUser = (req, res, next) => {
     },
   )
     .then((user) => {
-      if (!user) throw new NotFoundError('Пользователь с указанным _id не найден');
+      if (!user) throw new NotFoundError(updateUserNFE);
       return res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadReqError('Переданы некорректные данные при обновлении профиля'));
+        next(new BadReqError(updateUserValE));
         return;
       }
       if (err.code === 11000) {
-        next(new ConflictError('Данный email занят другим пользователем'));
+        next(new ConflictError(updateUserConflictE));
         return;
       }
       next(err);
@@ -76,11 +86,11 @@ const createUser = (req, res, next) => {
       }))
     .catch((err) => {
       if (err.code === 11000) {
-        next(new ConflictError('Такой пользователь уже зарегистрирован'));
+        next(new ConflictError(createUserConflictE));
         return;
       }
       if (err.name === 'ValidationError') {
-        next(new BadReqError('Переданы некорректные данные при создании пользователя'));
+        next(new BadReqError(createUserValE));
         return;
       }
       next(err);
@@ -100,7 +110,7 @@ const login = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'Unauthorized') {
-        next(new UnauthorizationError('Неправильный льгин или пароль'));
+        next(new UnauthorizationError(loginUnauthorized));
         return;
       }
       next(err);

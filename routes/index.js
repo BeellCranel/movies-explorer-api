@@ -5,10 +5,14 @@ const movieRouter = require('./movies');
 const { createUser, login } = require('../controllers/users');
 const auth = require('../middlewares/auth');
 const NotFoundError = require('../errors/NotFoundError');
+const {
+  crashTest,
+  routerNFE,
+} = require('../utils/constants');
 
 router.get('/crash-test', () => {
   setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
+    throw new Error(crashTest);
   }, 0);
 });
 router.post('/signup', celebrate({
@@ -28,7 +32,7 @@ router.use(auth);
 router.use('/', userRouter);
 router.use('/', movieRouter);
 router.use('*', (req, res, next) => {
-  next(new NotFoundError('Запрашиваемый ресурс не найден'));
+  next(new NotFoundError(routerNFE));
 });
 
 module.exports = router;
