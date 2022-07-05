@@ -44,6 +44,10 @@ const updateUser = (req, res, next) => {
         next(new BadReqError('Переданы некорректные данные при обновлении профиля'));
         return;
       }
+      if (err.code === 11000) {
+        next(new ConflictError('Данный email занят другим пользователем'));
+        return;
+      }
       next(err);
     });
 };

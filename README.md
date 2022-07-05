@@ -20,7 +20,7 @@
 
 ### Интро
 
-- домен: my-website.nomoredomains.xyz
+- домен: api.my-website.nomoredomains.xyz
 - публичный IP-адрес: 84.201.139.98
 
 ### Статус

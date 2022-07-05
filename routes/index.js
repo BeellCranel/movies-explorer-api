@@ -1,14 +1,11 @@
 const router = require('express').Router();
-const { celebrate, Joi, errors } = require('celebrate');
-const { requestLogger, errorLogger } = require('../middlewares/logger');
+const { celebrate, Joi } = require('celebrate');
 const userRouter = require('./users');
 const movieRouter = require('./movies');
 const { createUser, login } = require('../controllers/users');
 const auth = require('../middlewares/auth');
-const errorHandler = require('../middlewares/errorHandler');
 const NotFoundError = require('../errors/NotFoundError');
 
-router.use(requestLogger);
 router.get('/crash-test', () => {
   setTimeout(() => {
     throw new Error('Сервер сейчас упадёт');
@@ -17,7 +14,7 @@ router.get('/crash-test', () => {
 router.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    name: Joi.string().required(),
+    name: Joi.string().required().min(2).max(30),
     password: Joi.string().required(),
   }),
 }), createUser);
@@ -33,8 +30,5 @@ router.use('/', movieRouter);
 router.use('*', (req, res, next) => {
   next(new NotFoundError('Запрашиваемый ресурс не найден'));
 });
-router.use(errorLogger);
-router.use(errors()); // обработчик ошибок celebrate
-router.use(errorHandler);
 
 module.exports = router;

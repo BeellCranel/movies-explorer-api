@@ -3,6 +3,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const { errors } = require('celebrate');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+const errorHandler = require('./middlewares/errorHandler');
 const routes = require('./routes');
 
 const allowedCors = [
@@ -10,18 +13,20 @@ const allowedCors = [
   'http://my-website.nomoredomains.xyz',
   'https://my-website.nomoredomains.xyz',
 ];
-
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, dataMovies = 'mongodb://localhost:27017/bitfilmsdb' } = process.env;
 const app = express();
-mongoose.connect('mongodb://localhost:27017/bitfilmsdb');
-
+mongoose.connect(dataMovies);
 app.use(cors({
   origin: allowedCors,
 }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+app.use(requestLogger);
 app.use(routes);
+app.use(errorLogger);
+app.use(errors()); // обработчик ошибок celebrate
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
