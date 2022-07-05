@@ -22,7 +22,7 @@ const findUserBySelfId = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) throw new NotFoundError(findUserBySelfIdNFE);
-      return res.status(200).send(user);
+      return res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -47,7 +47,7 @@ const updateUser = (req, res, next) => {
   )
     .then((user) => {
       if (!user) throw new NotFoundError(updateUserNFE);
-      return res.status(200).send(user);
+      return res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -106,7 +106,7 @@ const login = (req, res, next) => {
         NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
         { expiresIn: '7d' },
       );
-      return res.status(200).send({ token });
+      return res.send({ token });
     })
     .catch((err) => {
       if (err.name === 'Unauthorized') {

@@ -1,37 +1,24 @@
 const router = require('express').Router();
-const { celebrate, Joi } = require('celebrate');
 const userRouter = require('./users');
 const movieRouter = require('./movies');
 const { createUser, login } = require('../controllers/users');
 const auth = require('../middlewares/auth');
 const NotFoundError = require('../errors/NotFoundError');
-const {
-  crashTest,
-  routerNFE,
-} = require('../utils/constants');
+const { valCreateUser, valLogin } = require('../middlewares/validator');
+const { crashTest, routerNFE } = require('../utils/constants');
+const { limiter, createUserLimiter } = require('../middlewares/rateLimit');
 
-router.get('/crash-test', () => {
+router.get('/crash-test', limiter, () => {
   setTimeout(() => {
     throw new Error(crashTest);
   }, 0);
 });
-router.post('/signup', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    name: Joi.string().required().min(2).max(30),
-    password: Joi.string().required(),
-  }),
-}), createUser);
-router.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), login);
+router.post('/signup', createUserLimiter, valCreateUser, createUser);
+router.post('/signin', limiter, valLogin, login);
 router.use(auth);
-router.use('/', userRouter);
-router.use('/', movieRouter);
-router.use('*', (req, res, next) => {
+router.use('/', limiter, userRouter);
+router.use('/', limiter, movieRouter);
+router.use('*', limiter, (req, res, next) => {
   next(new NotFoundError(routerNFE));
 });
 

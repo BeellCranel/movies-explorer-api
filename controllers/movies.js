@@ -12,7 +12,7 @@ const {
 const getMovies = (req, res, next) => {
   const owner = req.user._id;
   Movie.find({ owner })
-    .then((movie) => res.status(200).send(movie))
+    .then((movie) => res.send(movie))
     .catch(next);
 };
 
@@ -45,7 +45,7 @@ const postMovie = (req, res, next) => {
     movieId,
     owner,
   })
-    .then((movie) => res.status(200).send(movie))
+    .then((movie) => res.send(movie))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadReqError(postMovieValE));
@@ -61,7 +61,7 @@ const deleteMovie = (req, res, next) => {
       if (!movie) throw new NotFoundError(deleteMovieNFE);
       if (movie.owner.toString() !== req.user._id.toString()) throw new ForbiddenError('Карточка создана другим пользователем');
       return Movie.findByIdAndRemove(req.params._id)
-        .then(() => res.status(200).send({ message: `фильм ${movie.nameRU} успешно удален` }));
+        .then(() => res.send({ message: `фильм ${movie.nameRU} успешно удален` }));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
