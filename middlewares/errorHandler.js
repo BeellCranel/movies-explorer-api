@@ -3,10 +3,16 @@ module.exports = (err, req, res, next) => {
   const errMessage = err.message;
   if (statusCode) {
     res.status(statusCode).send({
+      errName: name,
+      status: statusCode,
       message: `${name}: ${errMessage}. Код ошибки: ${statusCode}.`,
     });
     return;
   }
-  res.status(500).send({ message: 'Произошла ошибка на сервере' });
+  res.status(500).send({
+    errName: 'ServerError',
+    status: 500,
+    message: 'Произошла ошибка на сервере',
+  });
   next();
 };
